@@ -1,9 +1,9 @@
 package order
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
-	"os"
 	"wb-l0/config"
 )
 
@@ -18,7 +18,7 @@ type ErrorResponse struct {
 }
 
 // Функция для обработки POST-запросов
-func HandlePost(w http.ResponseWriter, r *http.Request) {
+func HandlePost(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	switch r.Method {
 	case http.MethodPost:
 		var req OrderRequest
@@ -27,25 +27,19 @@ func HandlePost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Читаем файл config.json
-		data, err := os.ReadFile("config/config.json")
-		if err != nil {
-			http.Error(w, "unable to read config file", http.StatusInternalServerError)
-			return
-		}
-
-		// Парсим JSON файл в структуру Order
+		// Выполняем запрос к базе данных
+		query := `SELECT order_uid FROM orders WHERE order_uid = $1`
 		var orderData config.Order
-		if err := json.Unmarshal(data, &orderData); err != nil {
-			http.Error(w, "error parsing config file", http.StatusInternalServerError)
-			return
-		}
+		err := db.QueryRow(query, req.OrderUID).Scan(&orderData.OrderUID)
 
-		// Проверяем, существует ли заказ с данным order_uid
-		if req.OrderUID != orderData.OrderUID {
+		// Если заказ не найден
+		if err == sql.ErrNoRows {
 			resp := ErrorResponse{Error: "order not found"}
 			w.WriteHeader(http.StatusNotFound)
 			json.NewEncoder(w).Encode(resp)
+			return
+		} else if err != nil {
+			http.Error(w, "error querying database", http.StatusInternalServerError)
 			return
 		}
 
