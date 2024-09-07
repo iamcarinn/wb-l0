@@ -60,7 +60,7 @@ func (subs *Subs) InitSubs() {
 		sc.Close()
 		log.Fatal(err)
 	}
-
+	// TODO: поправить
 	log.Printf("Listening on [%s], clientID=[%s], qgroup=[%s] durable=[%s]\n", subj)
 
 	// 

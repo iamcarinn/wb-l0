@@ -31,18 +31,3 @@ func (c *Cache) GetFromCache(orderUID string) (model.Order, bool) {
 	order, ok := val.(model.Order)
 	return order, ok
 }
-
-
-
-// TODO: 3)
-// OK Когда заново запускается мой сервис, заполняется кэш из бд
-// OK это происходит в мейн
-// OK добавить метод в репо который будет доставать все и возвращать (слайс моделей)
-// OK и в кэш добавить метод который будет весь слайс моделей добавлять в кэш
-
-// липо не в слайс а в мапу
-// func NewFrom(defaultExpiration, cleanupInterval time.Duration, items map[string]Item) *Cache
-
-
-// TODO:
-// потом поменять хэндлер чтобы выдавать из кэша а не из базы
