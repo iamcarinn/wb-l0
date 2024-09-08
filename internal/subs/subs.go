@@ -60,10 +60,9 @@ func (subs *Subs) InitSubs() {
 		sc.Close()
 		log.Fatal(err)
 	}
-	// TODO: поправить
-	log.Printf("Listening on [%s], clientID=[%s], qgroup=[%s] durable=[%s]\n", subj)
 
-	// 
+	// log.Printf("Listening on [%s], clientID=[%s], qgroup=[%s] durable=[%s]\n", subj)
+
 	// Wait for a SIGINT (perhaps triggered by user with CTRL-C)
 	// Run cleanup when signal is received
 	signalChan := make(chan os.Signal, 1)	// Канал - механизм общения горутинами

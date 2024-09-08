@@ -14,12 +14,26 @@ type Handler struct {
 	cache *cache.Cache // Добавляем кэш
 }
 
+// // Создаем роутер (маршрутизатор)
+// func (h *Handler) Route() http.Handler {
+// 	router := http.NewServeMux() // мультиплексер
+// 	router.HandleFunc("/", h.HandlePost)
+// 	return router
+// }
+
 // Создаем роутер (маршрутизатор)
 func (h *Handler) Route() http.Handler {
 	router := http.NewServeMux() // мультиплексер
-	router.HandleFunc("/", h.HandlePost)
+
+	// Маршрут для статических файлов (HTML-страница)
+	router.Handle("/", http.FileServer(http.Dir(".")))
+
+	// Маршрут для обработки API-запросов
+	router.HandleFunc("/orders", h.HandlePost)
+
 	return router
 }
+
 
 // Создаем новый обработчик с подключением к базе данных и кэшем
 func New(repo repo.Repo, cache *cache.Cache) *Handler {
@@ -28,6 +42,7 @@ func New(repo repo.Repo, cache *cache.Cache) *Handler {
 		cache: cache,
 	}
 }
+
 func (h *Handler) HandlePost(w http.ResponseWriter, r *http.Request) {
     log.Printf("Received %s request for %s", r.Method, r.URL.Path)
 
@@ -59,7 +74,7 @@ func (h *Handler) HandlePost(w http.ResponseWriter, r *http.Request) {
 
         // Сохраняем найденный заказ в кэш
         h.cache.AddToCache(orderData)
-        
+
         // Возвращаем информацию о заказе
         w.WriteHeader(http.StatusOK)
         json.NewEncoder(w).Encode(orderData)
