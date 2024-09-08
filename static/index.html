@@ -4,18 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Lookup</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        #result {
-            margin-top: 20px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            white-space: pre-wrap; /* Preserves formatting */
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Order Lookup</h1>
@@ -26,26 +15,6 @@
     </form>
     <div id="result"></div>
 
-    <script>
-        document.getElementById('orderForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent form from submitting the traditional way
-            
-            const orderUID = document.getElementById('orderUID').value;
-            fetch('http://127.0.0.1:3330/orders', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ order_uid: orderUID }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
-            })
-            .catch(error => {
-                document.getElementById('result').textContent = 'Error: ' + error.message;
-            });
-        });
-    </script>
+    <script src="script.js"></script> <!-- Подключаем внешний JavaScript файл -->
 </body>
 </html>

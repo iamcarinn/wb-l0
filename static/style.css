@@ -1,0 +1,68 @@
+/* style.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4; /* Светло-серый фон для страницы */
+    margin: 0; /* Убираем отступы по умолчанию */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Центрирование по горизонтали */
+    justify-content: flex-start; /* Выравнивание по вертикали сверху */
+    height: 100vh; /* Высота на весь экран */
+    padding: 20px;
+    box-sizing: border-box; /* Включаем отступы в размер элемента */
+}
+
+h1 {
+    color: #333; /* Темно-серый цвет заголовка */
+    margin-bottom: 20px; /* Отступ снизу */
+}
+
+form {
+    background-color: #fff; /* Белый фон формы */
+    border: 1px solid #ddd; /* Светло-серый бордер */
+    padding: 20px;
+    border-radius: 5px; /* Скругление углов формы */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень */
+    max-width: 500px; /* Максимальная ширина формы */
+    width: 100%; /* Ширина формы на 100% */
+    margin-bottom: 20px; /* Отступ снизу */
+}
+
+label {
+    display: block; /* Делаем метку блочным элементом */
+    margin-bottom: 10px; /* Отступ снизу */
+    font-weight: bold; /* Жирный шрифт для метки */
+}
+
+input[type="text"] {
+    width: calc(100% - 22px); /* Ширина поля ввода с учетом внутреннего отступа */
+    padding: 10px;
+    border: 1px solid #ddd; /* Светло-серый бордер */
+    border-radius: 4px; /* Скругление углов поля ввода */
+    margin-bottom: 10px; /* Отступ снизу */
+}
+
+button {
+    background-color: #007bff; /* Синий фон кнопки */
+    color: #fff; /* Белый цвет текста на кнопке */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px; /* Скругление углов кнопки */
+    cursor: pointer; /* Указатель при наведении */
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #0056b3; /* Темнее синий при наведении */
+}
+
+#result {
+    background-color: #fff; /* Белый фон для результата */
+    border: 1px solid #ddd; /* Светло-серый бордер */
+    padding: 10px;
+    border-radius: 5px; /* Скругление углов */
+    white-space: pre-wrap; /* Сохранение форматирования текста */
+    max-width: 500px; /* Максимальная ширина блока с результатом */
+    width: 100%; /* Ширина блока на 100% */
+    overflow: auto; /* Добавление полосы прокрутки при необходимости */
+}
