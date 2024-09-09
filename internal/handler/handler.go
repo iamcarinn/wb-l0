@@ -14,13 +14,6 @@ type Handler struct {
 	cache *cache.Cache // Добавляем кэш
 }
 
-// // Создаем роутер (маршрутизатор)
-// func (h *Handler) Route() http.Handler {
-// 	router := http.NewServeMux() // мультиплексер
-// 	router.HandleFunc("/", h.HandlePost)
-// 	return router
-// }
-
 // Создаем роутер (маршрутизатор)
 func (h *Handler) Route() http.Handler {
 	router := http.NewServeMux() // мультиплексер

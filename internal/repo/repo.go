@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"log"
 
-	//"wb-l0/internal/cache"
 	"wb-l0/internal/model"
 )
 
@@ -91,21 +90,60 @@ func (repo *Repo) AddToDB(order model.Order) error {
 
 func (repo *Repo) GetOrder(id string) (*model.Order, error) {
 	// Выполняем запрос к базе данных
-	query := `SELECT order_uid FROM orders WHERE order_uid = $1`
+	orderQuery := `
+		SELECT order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard 
+		FROM orders 
+		WHERE order_uid = $1`
 	var orderData model.Order
-	err := repo.db.QueryRow(query, id).Scan(&orderData.OrderUID)
-	// Если заказ не найден
+	err := repo.db.QueryRow(orderQuery, id).Scan(&orderData.OrderUID, &orderData.TrackNumber, &orderData.Entry, &orderData.Locale, &orderData.InternalSignature, &orderData.CustomerID, &orderData.DeliveryService, &orderData.Shardkey, &orderData.SmID, &orderData.DateCreated, &orderData.OofShard)
 	if err != nil {
 		return nil, err
 	}
+
+	// Получаем данные из таблицы delivery
+	deliveryQuery := `SELECT name, phone, zip, city, address, region, email FROM delivery WHERE order_uid = $1`
+	err = repo.db.QueryRow(deliveryQuery, id).Scan(&orderData.Delivery.Name, &orderData.Delivery.Phone, &orderData.Delivery.Zip, &orderData.Delivery.City, &orderData.Delivery.Address, &orderData.Delivery.Region, &orderData.Delivery.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	// Получаем данные из таблицы payment
+	paymentQuery := `SELECT transaction, request_id, currency, provider, amount, payment_dt, bank, delivery_cost, goods_total, custom_fee FROM payment WHERE order_uid = $1`
+	err = repo.db.QueryRow(paymentQuery, id).Scan(&orderData.Payment.Transaction, &orderData.Payment.RequestID, &orderData.Payment.Currency, &orderData.Payment.Provider, &orderData.Payment.Amount, &orderData.Payment.PaymentDT, &orderData.Payment.Bank, &orderData.Payment.DeliveryCost, &orderData.Payment.GoodsTotal, &orderData.Payment.CustomFee)
+	if err != nil {
+		return nil, err
+	}
+
+	// Получаем данные из таблицы items
+	itemsQuery := `SELECT chrt_id, track_number, price, rid, name, sale, size, total_price, nm_id, brand, status FROM items WHERE order_uid = $1`
+	rows, err := repo.db.Query(itemsQuery, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var items []model.Item
+	for rows.Next() {
+		var item model.Item
+		if err := rows.Scan(&item.ChrtID, &item.TrackNumber, &item.Price, &item.RID, &item.Name, &item.Sale, &item.Size, &item.TotalPrice, &item.NMID, &item.Brand, &item.Status); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	orderData.Items = items
+
 	return &orderData, nil
 }
 
-// Возвращает все заказы из базы данных
 func (repo *Repo) GetAllOrders() ([]model.Order, error) {
-	query := `SELECT order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard 
-			  FROM orders`
-	rows, err := repo.db.Query(query)
+	// Получаем все заказы
+	orderQuery := `
+		SELECT order_uid 
+		FROM orders`
+	rows, err := repo.db.Query(orderQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -113,11 +151,17 @@ func (repo *Repo) GetAllOrders() ([]model.Order, error) {
 
 	var orders []model.Order
 	for rows.Next() {
-		var order model.Order
-		if err := rows.Scan(&order.OrderUID, &order.TrackNumber, &order.Entry, &order.Locale, &order.InternalSignature, &order.CustomerID, &order.DeliveryService, &order.Shardkey, &order.SmID, &order.DateCreated, &order.OofShard); err != nil {
+		var orderUID string
+		if err := rows.Scan(&orderUID); err != nil {
 			return nil, err
 		}
-		orders = append(orders, order)
+
+		// Используем GetOrder для получения полного заказа
+		order, err := repo.GetOrder(orderUID)
+		if err != nil {
+			return nil, err
+		}
+		orders = append(orders, *order)
 	}
 
 	if err := rows.Err(); err != nil {
