@@ -3,6 +3,7 @@ package repo
 import (
 	"database/sql"
 	"log"
+
 	//"wb-l0/internal/cache"
 	"wb-l0/internal/model"
 )
@@ -10,7 +11,6 @@ import (
 type Repo struct {
 	db *sql.DB
 }
-
 
 // Создание нового подключения к БД
 func New() Repo {
@@ -88,7 +88,6 @@ func (repo *Repo) AddToDB(order model.Order) error {
 
 	return nil
 }
-
 
 func (repo *Repo) GetOrder(id string) (*model.Order, error) {
 	// Выполняем запрос к базе данных
